@@ -6,19 +6,42 @@ import HomePage from "./pages/homepage/HomePage.component";
 import ShopPage from "./pages/shop/shop.component";
 import SignInAndSignOut from "./pages/sign-in-and-sign-out/sign-in-and-sign-out.component";
 import Header from "./components/header/header.component";
+import { auth } from "./firebase/firebase.utils";
 
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      currentUser: null,
+    };
+  }
 
-function App() {
-  return (
-    <div>
-    <Header />
-      <Routes>
-        <Route exact path="/" element={<HomePage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/signin" element={<SignInAndSignOut />} />
-      </Routes>
-    </div>
-  );
+  unsubscribeFromAuth = null;
+
+  componentDidMount() {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
+      this.setState({ currentUser: user });
+
+      console.log(user);
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromAuth();
+  }
+
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser} />
+        <Routes>
+          <Route exact path="/" element={<HomePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/signin" element={<SignInAndSignOut />} />
+        </Routes>
+      </div>
+    );
+  }
 }
 
 export default App;
